@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <title>TypeGPU GL retention reproduction</title>
+  <p>Run window.allocate(100), inspect the root, then window.root.destroy().</p>
+  <script type="module">
+    import { d } from "typegpu";
+    import { initWithGL } from "@typegpu/gl";
+
+    const gl = new OffscreenCanvas(1, 1).getContext("webgl2");
+    if (!gl) throw new Error("WebGL2 is unavailable");
+    const extension = gl.getExtension("WEBGL_debug_renderer_info");
+    window.renderer = gl.getParameter(
+      extension ? extension.UNMASKED_RENDERER_WEBGL : gl.RENDERER,
+    );
+    window.deletes = 0;
+    const deleteTexture = gl.deleteTexture.bind(gl);
+    gl.deleteTexture = (texture) => {
+      window.deletes++;
+      deleteTexture(texture);
+    };
+    window.root = initWithGL({ gl });
+    window.allocate = (count) => {
+      for (let i = 0; i < count; i++) {
+        window.root.createUniform(d.vec4f);
+        const texture = window.root.createTexture({
+          size: [1, 1],
+          format: "rgba8unorm",
+        });
+        texture.destroy();
+      }
+      // Caller references end here; the GL root stays alive.
+      if (gl.getError() !== gl.NO_ERROR) throw new Error("Unexpected GL error");
+    };
+  </script>
+</html>
