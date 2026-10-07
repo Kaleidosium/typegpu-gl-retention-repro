@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1"
   },
   "dependencies": {
-    "@typegpu/gl": "0.12.5",
+    "@typegpu/gl": "0.12.6",
     "typegpu": "0.12.6"
   },
   "devDependencies": {
