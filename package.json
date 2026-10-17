@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@typegpu/gl": "0.12.5",
-    "typegpu": "0.12.6"
+    "typegpu": "0.12.8"
   },
   "devDependencies": {
     "playwright": "1.63.0",
